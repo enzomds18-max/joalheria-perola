@@ -1,34 +1,23 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { supabase } from '../supabase';
-import { formatarPreco } from '../utils';
+import React from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { catalogo } from '../data/catalogo';
 import { cores } from '../theme';
 
 export default function CatalogoScreen({ navigation, route }) {
   const { usuario } = route.params || {};
-  const [produtos, setProdutos] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-
-  const carregar = useCallback(async () => {
-    setCarregando(true);
-    const { data, error } = await supabase.from('produtos').select('*').order('id');
-    if (!error) setProdutos(data || []);
-    setCarregando(false);
-  }, []);
-
-  useEffect(() => {
-    carregar();
-  }, [carregar]);
 
   function renderItem({ item }) {
     return (
-      <TouchableOpacity style={s.card} onPress={() => navigation.navigate('Detalhes', { produto: item })}>
-        <Text style={s.emoji}>{item.emoji || '💍'}</Text>
+      <TouchableOpacity
+        style={s.card}
+        onPress={() => navigation.navigate('Produtos', { categoriaId: item.id })}
+      >
+        <Text style={s.emoji}>{item.icone}</Text>
         <View style={{ flex: 1 }}>
           <Text style={s.nome}>{item.nome}</Text>
-          <Text style={s.categoria}>{item.categoria}</Text>
-          <Text style={s.preco}>{formatarPreco(item.preco)}</Text>
+          <Text style={s.qtd}>{item.produtos.length} modelos</Text>
         </View>
+        <Text style={s.seta}>›</Text>
       </TouchableOpacity>
     );
   }
@@ -36,18 +25,11 @@ export default function CatalogoScreen({ navigation, route }) {
   return (
     <View style={s.container}>
       <Text style={s.ola}>Olá, {usuario?.email}</Text>
-      {carregando ? (
-        <ActivityIndicator size="large" color={cores.azul} style={{ marginTop: 40 }} />
-      ) : (
-        <FlatList
-          data={produtos}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderItem}
-          refreshing={carregando}
-          onRefresh={carregar}
-          ListEmptyComponent={<Text style={s.vazio}>Nenhum produto cadastrado.</Text>}
-        />
-      )}
+      <FlatList
+        data={catalogo}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+      />
     </View>
   );
 }
@@ -55,10 +37,9 @@ export default function CatalogoScreen({ navigation, route }) {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: cores.fundo, padding: 12 },
   ola: { color: cores.cinza, marginBottom: 8 },
-  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: cores.branco, borderRadius: 10, padding: 14, marginBottom: 10, elevation: 2 },
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: cores.branco, borderRadius: 10, padding: 16, marginBottom: 10, elevation: 2 },
   emoji: { fontSize: 38, marginRight: 14 },
-  nome: { fontSize: 16, fontWeight: 'bold', color: cores.texto },
-  categoria: { color: cores.cinza, fontSize: 12 },
-  preco: { color: cores.azul, fontWeight: 'bold', marginTop: 4 },
-  vazio: { textAlign: 'center', marginTop: 40, color: cores.cinza },
+  nome: { fontSize: 18, fontWeight: 'bold', color: cores.texto },
+  qtd: { color: cores.cinza, marginTop: 2 },
+  seta: { fontSize: 28, color: cores.dourado },
 });

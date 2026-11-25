@@ -1,55 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Linking, Vibration, Alert } from 'react-native';
+import React from 'react';
+import { Text, TouchableOpacity, StyleSheet, Linking, Alert, Image, ScrollView } from 'react-native';
 import { formatarPreco } from '../utils';
 import { cores } from '../theme';
 
-// Troque pelo número de WhatsApp da loja (DDI+DDD+número, só dígitos)
-const WHATSAPP_LOJA = '5521999999999';
+const WHATSAPP_LOJA = '5521987294664';
 
 export default function DetalhesScreen({ route }) {
   const { produto } = route.params;
-  const [favorito, setFavorito] = useState(false);
 
-  // Recurso do celular #1: VIBRAR
-  function favoritar() {
-    Vibration.vibrate(200);
-    setFavorito(!favorito);
-  }
-
-  // Recurso do celular #2: WHATSAPP
   async function chamarWhatsApp() {
-    const msg = encodeURIComponent(`Olá! Tenho interesse em: ${produto.nome} (${formatarPreco(produto.preco)})`);
+    const texto = `Olá! Estou interessado(a) no produto ${produto.nome} (cód. ${produto.id}) por ${formatarPreco(produto.preco)}.`;
     try {
-      await Linking.openURL(`https://wa.me/${WHATSAPP_LOJA}?text=${msg}`);
+      await Linking.openURL(`https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(texto)}`);
     } catch {
       Alert.alert('Erro', 'Não foi possível abrir o WhatsApp.');
     }
   }
 
   return (
-    <View style={s.container}>
-      <Text style={s.emoji}>{produto.emoji || '💍'}</Text>
+    <ScrollView style={{ backgroundColor: cores.fundo }} contentContainerStyle={s.container}>
+      <Image source={produto.foto} style={s.foto} resizeMode="cover" />
       <Text style={s.nome}>{produto.nome}</Text>
       <Text style={s.preco}>{formatarPreco(produto.preco)}</Text>
-      <Text style={s.desc}>{produto.descricao}</Text>
 
-      <TouchableOpacity style={[s.botao, { backgroundColor: cores.azul }]} onPress={favoritar}>
-        <Text style={[s.botaoTxt, { color: cores.dourado }]}>{favorito ? '★ Favoritado' : '☆ Favoritar'}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[s.botao, { backgroundColor: '#25D366' }]} onPress={chamarWhatsApp}>
+      <TouchableOpacity style={s.botao} onPress={chamarWhatsApp}>
         <Text style={s.botaoTxt}>Chamar no WhatsApp</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: cores.fundo, padding: 24, alignItems: 'center' },
-  emoji: { fontSize: 100, marginVertical: 16 },
+  container: { padding: 24, alignItems: 'center' },
+  foto: { width: '100%', aspectRatio: 1, borderRadius: 12, marginBottom: 16 },
   nome: { fontSize: 24, fontWeight: 'bold', color: cores.texto, textAlign: 'center' },
   preco: { fontSize: 22, color: cores.azul, fontWeight: 'bold', marginVertical: 8 },
-  desc: { color: cores.cinza, textAlign: 'center', marginBottom: 24 },
-  botao: { width: '100%', padding: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 },
+  botao: { width: '100%', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 16, backgroundColor: '#25D366' },
   botaoTxt: { color: cores.branco, fontWeight: 'bold', fontSize: 16 },
 });

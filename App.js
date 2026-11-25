@@ -6,6 +6,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import CatalogoScreen from './src/screens/CatalogoScreen';
 import DetalhesScreen from './src/screens/DetalhesScreen';
 import { cores } from './src/theme';
+import ProdutosScreen from './src/screens/ProdutosScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ export default function App() {
       >
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Joalheria Pérola' }} />
         <Stack.Screen name="Catalogo" component={CatalogoScreen} options={{ title: 'Catálogo' }} />
+        <Stack.Screen name="Produtos" component={ProdutosScreen} options={{ title: 'Modelos' }} />
         <Stack.Screen name="Detalhes" component={DetalhesScreen} options={{ title: 'Detalhes' }} />
       </Stack.Navigator>
     </NavigationContainer>
